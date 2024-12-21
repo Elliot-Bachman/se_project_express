@@ -1,15 +1,9 @@
-// Import express
+// importing all modules and routes like express, mongoose, ect ect.
 const express = require("express");
-
-// Import mongoose
 const mongoose = require("mongoose");
-
-// Create an instance of an Express app
 const app = express();
-
-// import routes
-
 const mainRouter = require("./routes/index");
+const clothingItemsRoutes = require("./routes/clothingItems");
 
 // Set the port from the environment variable or default to 3001
 const { PORT = 3001 } = process.env;
@@ -26,6 +20,7 @@ mongoose
   })
   .catch(console.error);
 
+app.use(express.json());
 app.use("/", mainRouter);
 
 // Start the server
