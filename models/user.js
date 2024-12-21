@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema({
   },
   avatar: {
     type: String,
-    required: [true, "The avatar field isrequired."],
+    required: [true, "The avatar field is required."],
     validate: {
       validator(value) {
         return validator.isURL(value);
@@ -20,4 +20,5 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-module.export = mongoose.model("user", userSchema);
+// Correct export
+module.exports = mongoose.model("user", userSchema);
