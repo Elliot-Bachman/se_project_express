@@ -20,8 +20,7 @@ const handleError = (err, res) => {
 const createItem = (req, res) => {
   const { name, weather, imageUrl } = req.body;
 
-  // Ensure the owner is attached to the item
-  const owner = req.user?._id; // Safely access _id
+  const owner = req.user?._id;
   if (!owner) {
     console.error("Missing owner in request");
     return res
@@ -29,7 +28,6 @@ const createItem = (req, res) => {
       .send({ message: "Owner ID is missing from the request." });
   }
 
-  // Validate input fields
   if (!name || !weather || !imageUrl) {
     console.error("Validation failed:", req.body);
     return res
@@ -45,13 +43,14 @@ const createItem = (req, res) => {
     .catch((err) => handleError(err, res));
 };
 
-// Other functions remain unchanged
+// Get all clothing items
 const getItems = (req, res) => {
   ClothingItem.find({})
     .then((items) => res.status(200).send({ data: items }))
     .catch((err) => handleError(err, res));
 };
 
+// Update a clothing item
 const updateItem = (req, res) => {
   const { itemId } = req.params;
   const { imageUrl } = req.body;
@@ -72,6 +71,7 @@ const updateItem = (req, res) => {
     .catch((err) => handleError(err, res));
 };
 
+// Delete a clothing item
 const deleteItem = (req, res) => {
   const { itemId } = req.params;
 
@@ -85,6 +85,7 @@ const deleteItem = (req, res) => {
     .catch((err) => handleError(err, res));
 };
 
+// Like a clothing item
 const likeItem = (req, res) => {
   const { itemId } = req.params;
 
@@ -93,11 +94,28 @@ const likeItem = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     { new: true }
   )
-    .orFail(new Error("DocumentNotFoundError"))
+    .orFail(() => {
+      const error = new Error("DocumentNotFoundError");
+      error.name = "DocumentNotFoundError";
+      throw error;
+    })
     .then((item) => res.status(200).send({ data: item }))
-    .catch((err) => handleError(err, res));
+    .catch((err) => {
+      console.error("Error liking item:", err);
+
+      if (err.name === "DocumentNotFoundError") {
+        return res.status(404).send({ message: "Item not found." });
+      }
+
+      if (err.name === "CastError") {
+        return res.status(400).send({ message: "Invalid ID format." });
+      }
+
+      return res.status(500).send({ message: "Internal server error." });
+    });
 };
 
+// Dislike a clothing item
 const dislikeItem = (req, res) => {
   const { itemId } = req.params;
 
@@ -106,9 +124,25 @@ const dislikeItem = (req, res) => {
     { $pull: { likes: req.user._id } },
     { new: true }
   )
-    .orFail(new Error("DocumentNotFoundError"))
+    .orFail(() => {
+      const error = new Error("DocumentNotFoundError");
+      error.name = "DocumentNotFoundError";
+      throw error;
+    })
     .then((item) => res.status(200).send({ data: item }))
-    .catch((err) => handleError(err, res));
+    .catch((err) => {
+      console.error("Error disliking item:", err);
+
+      if (err.name === "DocumentNotFoundError") {
+        return res.status(404).send({ message: "Item not found." });
+      }
+
+      if (err.name === "CastError") {
+        return res.status(400).send({ message: "Invalid ID format." });
+      }
+
+      return res.status(500).send({ message: "Internal server error." });
+    });
 };
 
 module.exports = {
