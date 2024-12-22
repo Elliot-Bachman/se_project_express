@@ -75,14 +75,21 @@ const updateItem = (req, res) => {
 const deleteItem = (req, res) => {
   const { itemId } = req.params;
 
+  // Ensure a consistent return
   return ClothingItem.findByIdAndDelete(itemId)
     .orFail(() => {
       const error = new Error("DocumentNotFoundError");
       error.name = "DocumentNotFoundError";
       throw error;
     })
-    .then(() => res.status(204).send())
-    .catch((err) => handleError(err, res));
+    .then(() => {
+      res.status(204).send(); // Successfully deleted
+      return null; // Explicit return for ESLint
+    })
+    .catch((err) => {
+      handleError(err, res);
+      return null; // Explicit return for ESLint
+    });
 };
 
 // Like a clothing item
