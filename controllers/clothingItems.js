@@ -75,7 +75,7 @@ const updateItem = (req, res) => {
 const deleteItem = (req, res) => {
   const { itemId } = req.params;
 
-  ClothingItem.findByIdAndDelete(itemId)
+  return ClothingItem.findByIdAndDelete(itemId)
     .orFail(() => {
       const error = new Error("DocumentNotFoundError");
       error.name = "DocumentNotFoundError";
