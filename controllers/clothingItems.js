@@ -89,7 +89,8 @@ const deleteItem = (req, res) => {
     .catch((err) => {
       handleError(err, res);
       return null; // Explicit return for ESLint
-    });
+    })
+    .finally(() => null); // Ensures a return in all cases
 };
 
 // Like a clothing item
