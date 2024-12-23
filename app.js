@@ -1,7 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const mainRouter = require("./routes/index");
-const clothingItemsRoutes = require("./routes/clothingItems");
 
 // Set the port from the environment variable or default to 3001
 const { PORT = 3001 } = process.env;
@@ -13,11 +12,6 @@ app.use((req, res, next) => {
     _id: "676725a5a4d8109f0087ab58", // Replace with a valid user ID from your database
   };
   next();
-});
-
-// Define a simple route for testing
-app.get("/", (req, res) => {
-  res.send("Hello, Hot Reload!");
 });
 
 // MongoDB connection
@@ -34,7 +28,6 @@ mongoose
 
 app.use(express.json());
 app.use("/", mainRouter);
-app.use("/items", clothingItemsRoutes); // Register clothing items routes
 
 // Start the server
 app.listen(PORT, () => {
