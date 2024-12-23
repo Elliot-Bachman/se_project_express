@@ -4,16 +4,28 @@ const { ERROR_CODES, ERROR_MESSAGES } = require("../utils/errors");
 // Centralized error handler
 const handleError = (err, res) => {
   console.error(err);
+
   if (err.name === "ValidationError") {
-    return res.status(400).send({ message: "Validation failed." });
+    return res
+      .status(ERROR_CODES.BAD_REQUEST)
+      .send({ message: ERROR_MESSAGES.BAD_REQUEST });
   }
+
   if (err.name === "CastError") {
-    return res.status(400).send({ message: "Invalid ID format." });
+    return res
+      .status(ERROR_CODES.BAD_REQUEST)
+      .send({ message: ERROR_MESSAGES.INVALID_ID_FORMAT });
   }
+
   if (err.name === "DocumentNotFoundError") {
-    return res.status(404).send({ message: "Document not found." });
+    return res
+      .status(ERROR_CODES.NOT_FOUND)
+      .send({ message: ERROR_MESSAGES.NOT_FOUND });
   }
-  return res.status(500).send({ message: "Internal server error." });
+
+  return res
+    .status(ERROR_CODES.SERVER_ERROR)
+    .send({ message: ERROR_MESSAGES.SERVER_ERROR });
 };
 
 // Create a clothing item
@@ -25,19 +37,18 @@ const createItem = (req, res) => {
     console.error("Missing owner in request");
     return res
       .status(ERROR_CODES.BAD_REQUEST)
-      .send({ message: "Owner ID is missing from the request." });
+      .send({ message: ERROR_MESSAGES.MISSING_OWNER });
   }
 
   if (!name || !weather || !imageUrl) {
-    console.error("Validation failed:", req.body);
     return res
       .status(ERROR_CODES.BAD_REQUEST)
-      .send({ message: "Missing required fields: name, weather, imageUrl." });
+      .send({ message: ERROR_MESSAGES.MISSING_FIELDS });
   }
 
   return ClothingItem.create({ name, weather, imageUrl, owner })
     .then((item) => {
-      console.log("Item created successfully:", item);
+      console.info("Item created successfully:", item);
       return res.status(201).send({ data: item });
     })
     .catch((err) => handleError(err, res));
@@ -50,47 +61,23 @@ const getItems = (req, res) => {
     .catch((err) => handleError(err, res));
 };
 
-// Update a clothing item
-const updateItem = (req, res) => {
-  const { itemId } = req.params;
-  const { imageUrl } = req.body;
-
-  if (!imageUrl) {
-    return res
-      .status(ERROR_CODES.BAD_REQUEST)
-      .send({ message: ERROR_MESSAGES.BAD_REQUEST });
-  }
-
-  ClothingItem.findByIdAndUpdate(
-    itemId,
-    { $set: { imageUrl } },
-    { new: true, runValidators: true }
-  )
-    .orFail(new Error("DocumentNotFoundError"))
-    .then((item) => res.status(200).send({ data: item }))
-    .catch((err) => handleError(err, res));
-};
-
 // Delete a clothing item
-const deleteItem = (req, res) => {
+const deleteItem = async (req, res) => {
   const { itemId } = req.params;
 
-  // Ensure a consistent return
-  return ClothingItem.findByIdAndDelete(itemId)
-    .orFail(() => {
+  try {
+    const item = await ClothingItem.findByIdAndDelete(itemId).orFail(() => {
       const error = new Error("DocumentNotFoundError");
       error.name = "DocumentNotFoundError";
       throw error;
-    })
-    .then(() => {
-      res.status(204).send(); // Successfully deleted
-      return null; // Explicit return for ESLint
-    })
-    .catch((err) => {
-      handleError(err, res);
-      return null; // Explicit return for ESLint
-    })
-    .finally(() => null); // Ensures a return in all cases
+    });
+
+    res.status(200).send({ message: "Item deleted successfully", data: item });
+    return item; // Explicit return to satisfy ESLint
+  } catch (err) {
+    handleError(err, res);
+    return null; // Explicit return to satisfy ESLint
+  }
 };
 
 // Like a clothing item
@@ -109,7 +96,7 @@ const likeItem = (req, res) => {
     })
     .then((item) => res.status(200).send({ data: item }))
     .catch((err) => {
-      console.error("Error liking item:", err);
+      console.error("Error liking item:", err); // Optional: Replace with a logging library
 
       if (err.name === "DocumentNotFoundError") {
         return res.status(404).send({ message: "Item not found." });
@@ -139,7 +126,7 @@ const dislikeItem = (req, res) => {
     })
     .then((item) => res.status(200).send({ data: item }))
     .catch((err) => {
-      console.error("Error disliking item:", err);
+      console.error("Error disliking item:", err); // Optional: Replace with a logging library
 
       if (err.name === "DocumentNotFoundError") {
         return res.status(404).send({ message: "Item not found." });
@@ -156,7 +143,6 @@ const dislikeItem = (req, res) => {
 module.exports = {
   createItem,
   getItems,
-  updateItem,
   deleteItem,
   likeItem,
   dislikeItem,

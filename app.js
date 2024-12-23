@@ -23,8 +23,14 @@ app.get("/", (req, res) => {
 // MongoDB connection
 mongoose
   .connect("mongodb://127.0.0.1:27017/wtwr_db")
-  .then(() => console.log("connected to DB"))
-  .catch(console.error);
+  .then(() => {
+    if (process.env.NODE_ENV !== "production") {
+      console.info("Connected to DB");
+    }
+  })
+  .catch((err) => {
+    console.error("Error connecting to the database:", err);
+  });
 
 app.use(express.json());
 app.use("/", mainRouter);
@@ -32,5 +38,7 @@ app.use("/items", clothingItemsRoutes); // Register clothing items routes
 
 // Start the server
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  if (process.env.NODE_ENV !== "production") {
+    console.info(`Server is running on http://localhost:${PORT}`);
+  }
 });
