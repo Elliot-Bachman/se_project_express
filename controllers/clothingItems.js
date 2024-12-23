@@ -76,7 +76,6 @@ const deleteItem = async (req, res) => {
     return item; // Explicit return to satisfy ESLint
   } catch (err) {
     handleError(err, res);
-    return null; // Explicit return to satisfy ESLint
   }
 };
 
