@@ -73,7 +73,6 @@ const deleteItem = async (req, res) => {
     });
 
     res.status(200).send({ message: "Item deleted successfully", data: item });
-    return item; // Explicit return to satisfy ESLint
   } catch (err) {
     handleError(err, res);
   }
