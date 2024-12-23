@@ -85,7 +85,7 @@ const likeItem = (req, res) => {
 
   ClothingItem.findByIdAndUpdate(
     itemId,
-    { $addToSet: { likes: req.user._id } },
+    { $addToSet: { likes: req.user._id } }, // Add user ID if not already in likes array
     { new: true }
   )
     .orFail(() => {
@@ -98,14 +98,20 @@ const likeItem = (req, res) => {
       console.error("Error liking item:", err); // Optional: Replace with a logging library
 
       if (err.name === "DocumentNotFoundError") {
-        return res.status(404).send({ message: "Item not found." });
+        return res
+          .status(ERROR_CODES.NOT_FOUND)
+          .send({ message: ERROR_MESSAGES.NOT_FOUND });
       }
 
       if (err.name === "CastError") {
-        return res.status(400).send({ message: "Invalid ID format." });
+        return res
+          .status(ERROR_CODES.BAD_REQUEST)
+          .send({ message: ERROR_MESSAGES.INVALID_ID_FORMAT });
       }
 
-      return res.status(500).send({ message: "Internal server error." });
+      return res
+        .status(ERROR_CODES.SERVER_ERROR)
+        .send({ message: ERROR_MESSAGES.SERVER_ERROR });
     });
 };
 
