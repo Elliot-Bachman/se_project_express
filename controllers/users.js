@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const validator = require("validator");
 const { ERROR_CODES, ERROR_MESSAGES } = require("../utils/errors");
 
-const JWT_SECRET = require("../utils/config");
+const { JWT_SECRET } = require("../utils/config");
 
 // GET /users
 const getUsers = (req, res) => {
@@ -22,10 +22,25 @@ const getUsers = (req, res) => {
 const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
 
-  if (!email || !password) {
+  // Check for missing required fieldds
+  if (!email || !password || !name || !avatar) {
     return res
       .status(ERROR_CODES.BAD_REQUEST)
       .send({ message: ERROR_MESSAGES.MISSING_FIELDS });
+  }
+
+  // Validate email format
+  if (!validator.isEmail(email)) {
+    return res
+      .status(ERROR_CODES.BAD_REQUEST)
+      .send({ message: "Invalid email format." });
+  }
+
+  // Validate avatar URL format
+  if (!validator.isURL(avatar)) {
+    return res
+      .status(ERROR_CODES.BAD_REQUEST)
+      .send({ message: "Invalid avatar URL." });
   }
 
   bcrypt
@@ -57,7 +72,7 @@ const createUser = (req, res) => {
 
 // GET /users/:userId
 const getUser = (req, res) => {
-  const { userId } = req.params;
+  const { userId } = req.user._id;
   User.findById(userId)
     .orFail(() => {
       const error = new Error("DocumentNotFoundError");
