@@ -10,7 +10,7 @@ const ERROR_CODES = {
 const ERROR_MESSAGES = {
   BAD_REQUEST: "Bad request in data or syntax.",
   BAD_AUTHORIZATION: "Authorization required.",
-  BAD_CARD_REMOVAL: "Please do not delete other users cards",
+  BAD_CARD_REMOVAL: "You are not allowed to delete this item.",
   NOT_FOUND: "The request was sent to a non-existent address.",
   USED_EMAIL: "That email was already taken.",
   SERVER_ERROR: "An error has occurred on the server.",

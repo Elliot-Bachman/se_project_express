@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 const validator = require("validator");
 
 const userSchema = new mongoose.Schema({
@@ -21,10 +22,10 @@ const userSchema = new mongoose.Schema({
   email: {
     type: String,
     required: [true, "The email field is required."],
-    unique: true, // Ensure email is unique
+    unique: true,
     validate: {
       validator(value) {
-        return validator.isEmail(value); // Use validator to validate email
+        return validator.isEmail(value);
       },
       message: "You must enter a valid email address",
     },
@@ -32,10 +33,28 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: [true, "The password field is required."],
-    minlength: 8, // Ensure a minimum length for password
-    select: false, // Exclude password by default from query results
+    minlength: 8,
+    select: false, // Ensure password is excluded by default
   },
 });
 
-// Correct export
+// Custom method for authentication
+userSchema.statics.findUserByCredentials = function (email, password) {
+  return this.findOne({ email })
+    .select("+password") // Include password for authentication
+    .then((user) => {
+      if (!user) {
+        return Promise.reject(new Error("Incorrect email or password"));
+      }
+
+      return bcrypt.compare(password, user.password).then((matched) => {
+        if (!matched) {
+          return Promise.reject(new Error("Incorrect email or password"));
+        }
+
+        return user;
+      });
+    });
+};
+
 module.exports = mongoose.model("user", userSchema);

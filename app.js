@@ -1,18 +1,14 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const cors = require("cors"); // Import cors
 const mainRouter = require("./routes/index");
 
 // Set the port from the environment variable or default to 3001
 const { PORT = 3001 } = process.env;
 const app = express();
 
-// Middleware to simulate a logged-in user
-app.use((req, res, next) => {
-  req.user = {
-    _id: "676725a5a4d8109f0087ab58", // Replace with a valid user ID from your database
-  };
-  next();
-});
+// Enable CORS
+app.use(cors());
 
 // MongoDB connection
 mongoose
@@ -26,7 +22,10 @@ mongoose
     console.error("Error connecting to the database:", err);
   });
 
+// Middleware to parse JSON
 app.use(express.json());
+
+// Connect the main router
 app.use("/", mainRouter);
 
 // Start the server

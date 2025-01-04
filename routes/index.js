@@ -1,18 +1,22 @@
 const router = require("express").Router();
+const auth = require("../middlewares/auth");
+const clothingItemRouter = require("./clothingItems");
 const userRouter = require("./users");
-const clothingItem = require("./clothingItems");
-const { createUser, login } = require("../controllers/users"); // Import controllers
+const { createUser, login } = require("../controllers/users");
 const { ERROR_CODES, ERROR_MESSAGES } = require("../utils/errors");
 
-// Route handlers
-router.use("/users", userRouter);
-router.use("/items", clothingItem);
-
-//  Signup and signin routes
+// Public routes (no authorization needed)
 router.post("/signup", createUser);
-router.post("/signin", login); // Placeholder for now
+router.post("/signin", login);
+router.use("/items", clothingItemRouter); // GET /items does not require authorization
 
-// Middleware for handling unknown routes
+// Protected routes (require valid token)
+router.use("/users", userRouter);
+
+// Add protected routes here if needed
+// For example:
+// router.get("/users", getUsers);
+
 router.use((req, res) => {
   res.status(ERROR_CODES.NOT_FOUND).send({ message: ERROR_MESSAGES.NOT_FOUND });
 });

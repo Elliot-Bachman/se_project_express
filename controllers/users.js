@@ -1,6 +1,10 @@
 const User = require("../models/user");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const validator = require("validator");
 const { ERROR_CODES, ERROR_MESSAGES } = require("../utils/errors");
+
+const JWT_SECRET = require("../utils/config");
 
 // GET /users
 const getUsers = (req, res) => {
@@ -79,8 +83,85 @@ const getUser = (req, res) => {
     });
 };
 
+// User login
 const login = (req, res) => {
-  res.status(501).send({ message: "Login route not implemented yet." });
+  const { email, password } = req.body;
+
+  // Validate email and password presence
+  if (!email || !password) {
+    return res
+      .status(ERROR_CODES.BAD_REQUEST)
+      .send({ message: ERROR_MESSAGES.BAD_REQUEST });
+  }
+
+  // Validate email format
+  if (!validator.isEmail(email)) {
+    return res
+      .status(ERROR_CODES.BAD_REQUEST)
+      .send({ message: "Invalid email format." }); // You can add this message to ERROR_MESSAGES if you'd like
+  }
+
+  User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
+        expiresIn: "7d",
+      });
+      res.send({ token });
+    })
+    .catch((err) => {
+      // Return appropriate message for invalid credentials
+      if (err.message === "Incorrect email or password") {
+        return res
+          .status(ERROR_CODES.BAD_AUTHORIZATION)
+          .send({ message: ERROR_MESSAGES.BAD_AUTHORIZATION });
+      }
+
+      // Handle other unexpected errors
+      res
+        .status(ERROR_CODES.SERVER_ERROR)
+        .send({ message: ERROR_MESSAGES.SERVER_ERROR });
+    });
 };
 
-module.exports = { getUsers, createUser, getUser, login };
+// Update User
+
+const updateUser = (req, res) => {
+  const { name, avatar } = req.body;
+
+  // Ensure required fields are provided
+  if (!name || !avatar) {
+    return res
+      .status(ERROR_CODES.BAD_REQUEST)
+      .send({ message: ERROR_MESSAGES.BAD_REQUEST });
+  }
+
+  // Use the user ID from the request object (set by the auth middleware)
+  const userId = req.user._id;
+
+  // Update user and enable validators
+  User.findByIdAndUpdate(
+    userId,
+    { name, avatar },
+    { new: true, runValidators: true } // `new` returns updated document; `runValidators` ensures validation
+  )
+    .then((updatedUser) => {
+      if (!updatedUser) {
+        return res
+          .status(ERROR_CODES.NOT_FOUND)
+          .send({ message: ERROR_MESSAGES.NOT_FOUND });
+      }
+      res.status(200).send(updatedUser);
+    })
+    .catch((err) => {
+      if (err.name === "ValidationError") {
+        return res
+          .status(ERROR_CODES.BAD_REQUEST)
+          .send({ message: ERROR_MESSAGES.BAD_REQUEST });
+      }
+      res
+        .status(ERROR_CODES.SERVER_ERROR)
+        .send({ message: ERROR_MESSAGES.SERVER_ERROR });
+    });
+};
+
+module.exports = { getUsers, createUser, getUser, login, updateUser };
