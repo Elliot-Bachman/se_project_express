@@ -7,6 +7,9 @@ const mainRouter = require("./routes/index");
 const { PORT = 3001 } = process.env;
 const app = express();
 
+// Enable Mongoose debugging
+mongoose.set("debug", true); // Logs all Mongoose queries to the console
+
 // Enable CORS
 app.use(cors());
 
