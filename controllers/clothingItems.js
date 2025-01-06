@@ -57,11 +57,11 @@ const getItems = (req, res) => {
 // Delete a clothing item
 const deleteItem = async (req, res) => {
   const { itemId } = req.params;
-  const userId = req.user._id;
+  const userId = req.user._id; // Logged-in user's ID
 
   try {
     const item = await ClothingItem.findById(itemId).orFail(() => {
-      const error = new Error("DocumentNotFoundError");
+      const error = new Error(ERROR_MESSAGES.NOT_FOUND);
       error.name = "DocumentNotFoundError";
       throw error;
     });
@@ -75,10 +75,21 @@ const deleteItem = async (req, res) => {
     await item.deleteOne();
     return res.status(200).send({ message: "Item deleted successfully." });
   } catch (err) {
-    console.error(err);
-    return res.status(ERROR_CODES.SERVER_ERROR).send({
-      message: ERROR_MESSAGES.SERVER_ERROR,
-    }); // Explicit response
+    if (err.name === "CastError") {
+      return res
+        .status(ERROR_CODES.BAD_REQUEST)
+        .send({ message: ERROR_MESSAGES.INVALID_ID_FORMAT });
+    }
+
+    if (err.name === "DocumentNotFoundError") {
+      return res
+        .status(ERROR_CODES.NOT_FOUND)
+        .send({ message: ERROR_MESSAGES.NOT_FOUND });
+    }
+
+    return res
+      .status(ERROR_CODES.SERVER_ERROR)
+      .send({ message: ERROR_MESSAGES.SERVER_ERROR });
   }
 };
 
