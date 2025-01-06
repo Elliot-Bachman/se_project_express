@@ -19,7 +19,7 @@ module.exports = (req, res, next) => {
     const payload = jwt.verify(token, JWT_SECRET);
     req.user = payload;
     console.log("Auth middleware set req.user:", req.user); // Debug log
-    next();
+    return next();
   } catch (err) {
     console.error("Invalid token:", err.message); // Log token verification errors
     return res
