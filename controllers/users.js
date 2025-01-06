@@ -54,6 +54,7 @@ const createUser = (req, res) => {
       res.status(201).send(userWithoutPassword);
     })
     .catch((err) => {
+      console.error("Error in createUser:", err);
       if (err.code === 11000) {
         return res
           .status(ERROR_CODES.USED_EMAIL)
