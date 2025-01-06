@@ -70,28 +70,35 @@ const createUser = (req, res) => {
     });
 };
 
-// GET /users/:userId
+// GET /users/me
 const getUser = (req, res) => {
-  const userId = req.user._id;
+  const userId = req.user._id; // Extract user ID from the JWT payload
+
   User.findById(userId)
     .orFail(() => {
       const error = new Error("DocumentNotFoundError");
       error.name = "DocumentNotFoundError";
       throw error;
     })
-    .then((user) => res.status(200).send(user))
+    .then((user) => {
+      // If user is found, send the user data
+      res.status(200).send(user);
+    })
     .catch((err) => {
       console.error(err);
+
       if (err.name === "DocumentNotFoundError") {
         return res
           .status(ERROR_CODES.NOT_FOUND)
           .send({ message: ERROR_MESSAGES.NOT_FOUND });
       }
+
       if (err.name === "CastError") {
         return res
           .status(ERROR_CODES.BAD_REQUEST)
           .send({ message: ERROR_MESSAGES.INVALID_ID_FORMAT });
       }
+
       return res
         .status(ERROR_CODES.SERVER_ERROR)
         .send({ message: ERROR_MESSAGES.SERVER_ERROR });
