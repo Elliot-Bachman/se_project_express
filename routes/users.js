@@ -11,7 +11,7 @@ const auth = require("../middlewares/auth");
 router.use(auth);
 
 // Define user routes
-router.get("/", getUsers);
+router.get("/me", getUsers);
 router.get("/:userId", getUser);
 router.post("/", createUser); // Likely no longer needed if you handle signup elsewhere
 router.patch("/me", updateUser);
