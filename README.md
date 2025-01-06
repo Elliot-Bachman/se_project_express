@@ -1,65 +1,93 @@
-# WTWR Backend (What to Wear)
+WTWR Backend (What to Wear)
+This is the backend service for the WTWR (What to Wear) project. It handles requests for managing users and clothing items in the application, including creating, reading, updating, and deleting (CRUD) functionality. The backend now includes authentication and authorization features, interacting with a MongoDB database to persist data and adhering to modern RESTful API design principles.
 
-This is the backend service for the **WTWR (What to Wear)** project. It is designed to handle requests for managing users and clothing items in the application, including creating, reading, updating, and deleting (CRUD) functionality. The backend interacts with a MongoDB database to persist data and follows modern RESTful API design principles.
-
----
-
-## Project Functionality
-
+Project Functionality
 The backend provides the following features:
 
-- **User Management:**
-
-  - Retrieve a list of users.
-  - Create a new user.
-  - Retrieve a specific user by ID.
-
-- **Clothing Item Management:**
-
-  - Retrieve a list of clothing items.
-  - Create a new clothing item.
-  - Delete a clothing item by ID.
-  - Like or dislike a clothing item.
-
-- **Error Handling:**
-  - Handling of invalid routes, invalid data, and server errors.
-  - Proper status codes and descriptive error messages.
-
----
-
-## Technologies Used
-
+User Management:
+Sign up a new user with email, password, name, and avatar.
+Sign in an existing user and receive a JWT for authentication.
+Retrieve the currently logged-in user's profile.
+Update the profile of the logged-in user (name and avatar only).
+Clothing Item Management:
+Retrieve a list of clothing items.
+Create a new clothing item (requires authentication).
+Delete a clothing item by ID (only the item's owner can delete it).
+Like or dislike a clothing item (requires authentication).
+Authentication and Authorization:
+Protect all routes except /signup, /signin, and GET /items.
+Use JWTs to verify the identity of users and restrict access to their data.
+Error Handling:
+Handle invalid routes, invalid data, duplicate email errors, and server errors.
+Return proper status codes and descriptive error messages.
+Technologies Used
 This project is built with the following technologies:
 
-### Backend Framework:
+Backend Framework:
+Express.js: Fast and lightweight web application framework for Node.js.
+Database:
+MongoDB: NoSQL database for storing users and clothing items.
+Mongoose: Object Data Modeling (ODM) library for MongoDB and Node.js.
+Authentication and Authorization:
+jsonwebtoken: For generating and verifying JWTs.
+bcryptjs: For hashing user passwords.
+Linting and Code Formatting:
+ESLint: JavaScript linting tool to enforce code quality and consistency.
+Prettier: Code formatter to maintain a consistent style.
+Testing:
+Postman: API testing and debugging tool to verify endpoints.
+GitHub Actions: Continuous integration to ensure all tests and linting pass.
+Other Tools and Techniques:
+RESTful Design Principles: For structured and consistent API design.
+Environment Variables: Used for configuration, including JWT secrets and port numbers.
+CORS: For cross-origin resource sharing to allow frontend-backend interaction.
+How to Run the Project
+Install Dependencies:
 
-- **[Express.js](https://expressjs.com/):** Fast and lightweight web application framework for Node.js.
+bash
+Copy code
+npm install
+Set Up Environment Variables: Create a .env file in the project root and add the following:
 
-### Database:
+plaintext
+Copy code
+PORT=3001
+JWT_SECRET=your_secret_key_here
+Start MongoDB: Ensure MongoDB is running locally or configure your connection string in the project.
 
-- **[MongoDB](https://www.mongodb.com/):** NoSQL database for storing users and clothing items.
-- **[Mongoose](https://mongoosejs.com/):** Object Data Modeling (ODM) library for MongoDB and Node.js.
+Run the Project:
 
-### Linting and Code Formatting:
+bash
+Copy code
+npm start
+Run in Development Mode:
 
-- **[ESLint](https://eslint.org/):** JavaScript linting tool to enforce code quality and consistency.
-- **[Prettier](https://prettier.io/):** Code formatter to maintain a consistent style.
+bash
+Copy code
+npm run dev
+API Endpoints
+Authentication
+POST /signup: Register a new user.
+POST /signin: Authenticate an existing user and receive a token.
+Users
+GET /users/me: Retrieve the logged-in user's profile.
+PATCH /users/me: Update the logged-in user's profile (name and avatar).
+Clothing Items
+GET /items: Retrieve a list of clothing items.
+POST /items: Create a new clothing item (requires authentication).
+DELETE /items/:itemId: Delete a clothing item (only the owner can delete it).
+PUT /items/:itemId/likes: Like a clothing item.
+DELETE /items/:itemId/likes: Dislike a clothing item.
+Testing and Linting
+Run Tests:
+bash
+Copy code
+npm test
+Run ESLint:
+bash
+Copy code
+npx eslint .
 
-### Testing:
+```
 
-- **[Postman](https://www.postman.com/):** API testing and debugging tool to verify endpoints.
-- **GitHub Actions:** Continuous integration to ensure all tests and linting pass.
-
-### Other Tools and Techniques:
-
-- **RESTful Design Principles:** For structured and consistent API design.
-- **Environment Variables:** Used for configuration, including setting up the port.
-
----
-
-## How to Run the Project
-
-1. **Install Dependencies:**
-   ```bash
-   npm install
-   ```
+```

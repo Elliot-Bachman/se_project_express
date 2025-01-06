@@ -57,28 +57,28 @@ const getItems = (req, res) => {
 // Delete a clothing item
 const deleteItem = async (req, res) => {
   const { itemId } = req.params;
-  const userId = req.user._id; // Get the logged-in user's ID from the request
+  const userId = req.user._id;
 
   try {
-    // Find the item by ID
     const item = await ClothingItem.findById(itemId).orFail(() => {
       const error = new Error("DocumentNotFoundError");
       error.name = "DocumentNotFoundError";
       throw error;
     });
 
-    // Check if the logged-in user is the owner of the item
     if (item.owner.toString() !== userId) {
       return res
         .status(ERROR_CODES.BAD_CARD_REMOVAL)
         .send({ message: ERROR_MESSAGES.BAD_CARD_REMOVAL });
     }
 
-    // If the user is the owner, delete the item
-    await item.deleteOne(); // Use deleteOne directly on the document
-    res.status(200).send({ message: "Item deleted successfully", data: item });
+    await item.deleteOne();
+    return res.status(200).send({ message: "Item deleted successfully." });
   } catch (err) {
-    handleError(err, res);
+    console.error(err);
+    return res.status(ERROR_CODES.SERVER_ERROR).send({
+      message: ERROR_MESSAGES.SERVER_ERROR,
+    }); // Explicit response
   }
 };
 
