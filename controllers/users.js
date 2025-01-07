@@ -6,18 +6,6 @@ const { ERROR_CODES, ERROR_MESSAGES } = require("../utils/errors");
 
 const { JWT_SECRET } = require("../utils/config");
 
-// GET /users
-const getUsers = (req, res) => {
-  User.find({})
-    .then((users) => res.status(200).send(users))
-    .catch((err) => {
-      console.error(err);
-      return res
-        .status(ERROR_CODES.SERVER_ERROR)
-        .send({ message: ERROR_MESSAGES.SERVER_ERROR });
-    });
-};
-
 // POST /users
 const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
@@ -177,4 +165,4 @@ const updateUser = (req, res) => {
     });
 };
 
-module.exports = { getUsers, createUser, getUser, login, updateUser };
+module.exports = { createUser, getUser, login, updateUser };
