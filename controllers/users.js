@@ -14,21 +14,7 @@ const createUser = (req, res) => {
   if (!email || !password || !name || !avatar) {
     return res
       .status(ERROR_CODES.BAD_REQUEST)
-      .send({ message: ERROR_MESSAGES.MISSING_FIELDS });
-  }
-
-  // Validate email format
-  if (!validator.isEmail(email)) {
-    return res
-      .status(ERROR_CODES.BAD_REQUEST)
-      .send({ message: "Invalid email format." });
-  }
-
-  // Validate avatar URL format
-  if (!validator.isURL(avatar)) {
-    return res
-      .status(ERROR_CODES.BAD_REQUEST)
-      .send({ message: "Invalid avatar URL." });
+      .send({ message: ERROR_MESSAGES.BAD_REQUEST });
   }
 
   return bcrypt
