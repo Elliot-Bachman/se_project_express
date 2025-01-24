@@ -11,7 +11,7 @@ const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
 
   // Check for missing required fields
-  if (!email || !password || !name || !avatar) {
+  if (!email || !password || !name) {
     return res
       .status(ERROR_CODES.BAD_REQUEST)
       .send({ message: ERROR_MESSAGES.BAD_REQUEST });
@@ -98,7 +98,15 @@ const login = (req, res) => {
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
         expiresIn: "7d",
       });
-      return res.send({ token });
+      return res.send({
+        token,
+        user: {
+          name: user.name,
+          email: user.email,
+          avatar: user.avatar,
+          _id: user._id,
+        },
+      });
     })
     .catch((err) => {
       if (err.message === "Incorrect email or password") {
