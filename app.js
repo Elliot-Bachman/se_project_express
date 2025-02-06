@@ -6,6 +6,7 @@ const { errors } = require("celebrate");
 const { requestLogger, errorLogger } = require("./middlewares/logger");
 const routes = require("./routes");
 const errorHandler = require("./middlewares/error-handler");
+require("dotenv").config();
 
 // Set the port from the environment variable or default to 3001
 const { PORT = 3001 } = process.env;
