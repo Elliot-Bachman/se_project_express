@@ -54,6 +54,13 @@ app.use(errors());
 // Centralized error handler
 app.use(errorHandler);
 
+// Crash-test route
+app.get("/crash-test", () => {
+  setTimeout(() => {
+    throw new Error("Server will crash now");
+  }, 0);
+});
+
 // Start the server
 app.listen(PORT, () => {
   if (process.env.NODE_ENV !== "production") {
