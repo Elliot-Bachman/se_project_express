@@ -84,7 +84,7 @@ const login = (req, res) => {
   if (!email || !password) {
     return res
       .status(ERROR_CODES.BAD_REQUEST)
-      .send({ message: ERROR_MESSAGES.BAD_REQUEST });
+      .send({ message: "Email and password are required." });
   }
 
   if (!validator.isEmail(email)) {
@@ -108,16 +108,11 @@ const login = (req, res) => {
         },
       });
     })
-    .catch((err) => {
-      if (err.message === "Incorrect email or password") {
-        return res
-          .status(ERROR_CODES.BAD_AUTHORIZATION)
-          .send({ message: ERROR_MESSAGES.BAD_AUTHORIZATION });
-      }
-
+    .catch(() => {
+      // Instead of checking the message, we directly send a 401 error
       return res
-        .status(ERROR_CODES.SERVER_ERROR)
-        .send({ message: ERROR_MESSAGES.SERVER_ERROR });
+        .status(ERROR_CODES.BAD_AUTHORIZATION)
+        .send({ message: "Incorrect email or password" });
     });
 };
 
