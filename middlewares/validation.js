@@ -11,6 +11,21 @@ const validateURL = (value, helpers) => {
   return helpers.error("string.uri");
 };
 
+//  Validation for updating user profile (name & avatar)
+const validateUserUpdate = celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().min(2).max(30).required().messages({
+      "string.min": 'The minimum length of the "name" field is 2',
+      "string.max": 'The maximum length of the "name" field is 30',
+      "string.empty": 'The "name" field must be filled in',
+    }),
+    avatar: Joi.string().required().custom(validateURL).messages({
+      "string.empty": "Avatar URL is required.",
+      "string.uri": "Avatar must be a valid URL.",
+    }),
+  }),
+});
+
 // Custom validation for emails
 const validateEmail = (value, helpers) => {
   if (validator.isEmail(value)) {
@@ -96,4 +111,5 @@ module.exports = {
   validateUserInfo,
   validateUserLogin,
   validateId,
+  validateUserUpdate,
 };
