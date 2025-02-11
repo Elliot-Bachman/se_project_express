@@ -27,7 +27,7 @@ const validateObjectId = (value, helpers) => {
   return helpers.error("string.hex");
 };
 
-// Validate clothing item creation
+// Validate clothing item creation (Added `weather` field)
 const validateClothingItem = celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30).messages({
@@ -38,6 +38,10 @@ const validateClothingItem = celebrate({
     imageUrl: Joi.string().required().custom(validateURL).messages({
       "string.empty": 'The "imageUrl" field must be filled in',
       "string.uri": 'The "imageUrl" field must be a valid URL',
+    }),
+    weather: Joi.string().valid("hot", "warm", "cold").required().messages({
+      "any.only": 'The "weather" field must be one of: hot, warm, cold',
+      "string.empty": 'The "weather" field must be filled in',
     }),
   }),
 });
@@ -64,7 +68,7 @@ const validateUserInfo = celebrate({
   }),
 });
 
-// Validate user login
+//  Validate user login
 const validateUserLogin = celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().custom(validateEmail).messages({
@@ -77,11 +81,11 @@ const validateUserLogin = celebrate({
   }),
 });
 
-// Validate ID params for routes (e.g., user ID, clothing item ID)
+// Validate ID params for routes (Renamed `id` → `itemId`)
 const validateId = celebrate({
   params: Joi.object().keys({
-    id: Joi.string().required().custom(validateObjectId).messages({
-      "string.empty": "ID is required.",
+    itemId: Joi.string().required().custom(validateObjectId).messages({
+      "string.empty": "Item ID is required.",
       "string.hex": "Invalid ID format. Must be a 24-character hex string.",
     }),
   }),
