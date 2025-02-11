@@ -1,29 +1,22 @@
-const { ERROR_CODES, ERROR_MESSAGES } = require("./errors");
+const {
+  BadRequestError,
+  UnauthorizedError,
+  ForbiddenError,
+  NotFoundError,
+  ConflictError,
+  InternalServerError,
+} = require("../utils/errors");
 
-const handleError = (err, res) => {
+const errorHandler = (err, req, res, next) => {
   console.error(err);
 
-  if (err.name === "ValidationError") {
-    return res
-      .status(ERROR_CODES.BAD_REQUEST)
-      .send({ message: ERROR_MESSAGES.BAD_REQUEST });
-  }
-
-  if (err.name === "CastError") {
-    return res
-      .status(ERROR_CODES.BAD_REQUEST)
-      .send({ message: ERROR_MESSAGES.INVALID_ID_FORMAT });
-  }
-
-  if (err.name === "DocumentNotFoundError") {
-    return res
-      .status(ERROR_CODES.NOT_FOUND)
-      .send({ message: ERROR_MESSAGES.NOT_FOUND });
+  if (err.statusCode) {
+    return res.status(err.statusCode).send({ message: err.message });
   }
 
   return res
-    .status(ERROR_CODES.SERVER_ERROR)
-    .send({ message: ERROR_MESSAGES.SERVER_ERROR });
+    .status(500)
+    .send({ message: "An unexpected error occurred on the server." });
 };
 
-module.exports = handleError;
+module.exports = errorHandler;
