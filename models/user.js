@@ -9,16 +9,18 @@ const userSchema = new mongoose.Schema({
     minlength: 2,
     maxlength: 30,
   },
+
   avatar: {
     type: String,
+    required: true, //  Added required: true
     validate: {
       validator(value) {
-        return value === "" || validator.isURL(value);
+        return validator.isURL(value); // Removed empty value check
       },
       message: "You must enter a valid URL",
     },
-    default: "",
   },
+
   email: {
     type: String,
     required: [true, "The email field is required."],
@@ -30,6 +32,7 @@ const userSchema = new mongoose.Schema({
       message: "You must enter a valid email address",
     },
   },
+
   password: {
     type: String,
     required: [true, "The password field is required."],
@@ -45,12 +48,10 @@ userSchema.statics.findUserByCredentials = function (email, password) {
       if (!user) {
         return Promise.reject(new Error("Incorrect email or password"));
       }
-
       return bcrypt.compare(password, user.password).then((matched) => {
         if (!matched) {
           return Promise.reject(new Error("Incorrect email or password"));
         }
-
         return user;
       });
     });
