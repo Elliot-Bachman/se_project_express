@@ -1,4 +1,4 @@
-// ✅ Load environment variables **before** any other imports
+//  Load environment variables **before** any other imports
 require("dotenv").config();
 
 const express = require("express");
