@@ -1,12 +1,3 @@
-const {
-  BadRequestError,
-  UnauthorizedError,
-  ForbiddenError,
-  NotFoundError,
-  ConflictError,
-  InternalServerError,
-} = require("../utils/errors");
-
 const errorHandler = (err, req, res, next) => {
   console.error(err);
 

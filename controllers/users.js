@@ -20,7 +20,7 @@ const createUser = (req, res, next) => {
     return next(new BadRequestError());
   }
 
-  bcrypt
+  return bcrypt
     .hash(password, 10)
     .then((hashedPassword) =>
       User.create({ name, avatar, email, password: hashedPassword })
@@ -28,33 +28,35 @@ const createUser = (req, res, next) => {
     .then((user) => {
       const userWithoutPassword = user.toObject();
       delete userWithoutPassword.password;
-      res.status(201).send(userWithoutPassword);
+      return res.status(201).send(userWithoutPassword); // ✅ Explicit return
     })
     .catch((err) => {
       if (err.code === 11000) {
         return next(new ConflictError());
       }
       if (err.name === "ValidationError") {
-        return next(new BadRequestError());
+        return next(
+          new BadRequestError("Missing required fields: name, email, password")
+        );
       }
-      next(new InternalServerError());
+      return next(new InternalServerError());
     });
 };
 
-/// GET /users/me
+// GET /users/me
 const getUser = (req, res, next) => {
   const userId = req.user._id;
 
-  User.findById(userId)
+  return User.findById(userId)
     .orFail(() => {
       throw new NotFoundError();
     })
-    .then((user) => res.status(200).send(user))
+    .then((user) => res.status(200).send(user)) // ✅ Fix applied (implicit return)
     .catch((err) => {
       if (err.name === "CastError") {
         return next(new BadRequestError("Invalid ID format."));
       }
-      next(err);
+      return next(err);
     });
 };
 
@@ -70,7 +72,7 @@ const login = (req, res, next) => {
     return next(new BadRequestError("Invalid email format."));
   }
 
-  User.findUserByCredentials(email, password)
+  return User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
         expiresIn: "7d",
@@ -97,22 +99,24 @@ const updateUser = (req, res, next) => {
 
   const userId = req.user._id;
 
-  User.findByIdAndUpdate(
+  return User.findByIdAndUpdate(
     userId,
     { name, avatar },
     { new: true, runValidators: true }
   )
     .then((updatedUser) => {
       if (!updatedUser) {
-        throw new NotFoundError();
+        return next(new NotFoundError()); // ✅ Added return
       }
-      res.status(200).send(updatedUser);
+      return res.status(200).send(updatedUser); // ✅ Added return
     })
     .catch((err) => {
       if (err.name === "ValidationError") {
-        return next(new BadRequestError());
+        return next(
+          new BadRequestError("Missing required fields: name, avatar")
+        );
       }
-      next(err);
+      return next(err);
     });
 };
 

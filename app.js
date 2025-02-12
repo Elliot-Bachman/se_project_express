@@ -5,7 +5,6 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors"); // Import cors
 const { errors } = require("celebrate");
-const mainRouter = require("./routes/index");
 const { requestLogger, errorLogger } = require("./middlewares/logger");
 const routes = require("./routes");
 const errorHandler = require("./middlewares/error-handler");

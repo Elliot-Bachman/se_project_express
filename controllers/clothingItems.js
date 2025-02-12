@@ -20,16 +20,16 @@ const createItem = (req, res, next) => {
     );
   }
 
-  ClothingItem.create({ name, weather, imageUrl, owner })
+  return ClothingItem.create({ name, weather, imageUrl, owner })
     .then((item) => res.status(201).send({ data: item }))
-    .catch((err) => next(new InternalServerError()));
+    .catch(() => next(new InternalServerError()));
 };
 
 // Get all clothing items
 const getItems = (req, res, next) => {
   ClothingItem.find({})
     .then((items) => res.status(200).send({ data: items }))
-    .catch((err) => next(new InternalServerError()));
+    .catch(() => next(new InternalServerError()));
 };
 
 // Delete a clothing item
@@ -70,7 +70,7 @@ const likeItem = (req, res, next) => {
       if (err.name === "CastError") {
         return next(new BadRequestError("Invalid ID format."));
       }
-      next(err);
+      return next(err);
     });
 };
 
@@ -91,7 +91,7 @@ const dislikeItem = (req, res, next) => {
       if (err.name === "CastError") {
         return next(new BadRequestError("Invalid ID format."));
       }
-      next(err);
+      return next(err);
     });
 };
 
