@@ -1,6 +1,6 @@
 WTWR (What to Wear) - Full Stack Project
 🌍 Live Demo
-Frontend: https://wtwr-demo.mindhackers.org
+Frontend: https://what-to-wear-clothes.jumpingcrab.com/
 Backend API: https://api.wtwr-demo.mindhackers.org
 📌 Project Overview
 WTWR is a full-stack web application that allows users to:

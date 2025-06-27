@@ -6,7 +6,7 @@ const {
   validateUserInfo,
   validateUserLogin,
 } = require("../middlewares/validation"); //  Import validation
-const NotFoundError = require("../utils/errors/NotFoundError");
+const NotFoundError = require("../utils/errors");
 
 //  Public routes (no authorization needed)
 router.post("/signup", validateUserInfo, createUser);
